@@ -1,6 +1,5 @@
 from django.shortcuts import render
 import markdown2
-from django.http import HttpResponse
 import random
 
 from . import util
@@ -53,13 +52,27 @@ def new_entry(request):
         desc = request.POST['info']
 
         if title is "":
-            return HttpResponse("Title can't be empty")
+            return render(request, 'encyclopedia/error.html', {
+                'message': "The Title is empty",
+            })
+
+        if desc is "":
+            return render(request, 'encyclopedia/error.html', {
+                'message': "The Content is empty",
+            })
+
 
         if entry is not None:
-            return HttpResponse('This title already exists')
+            return render(request, 'encyclopedia/error.html', {
+                'message': "The Title already exists",
+            })
         else:
             util.save_entry(title, desc)
-            return render(request, 'encyclopedia/new_entry.html', {})
+            entry = convertMd(title)
+            return render(request, "encyclopedia/entry.html", {
+                "title": title,
+                "info": entry,
+            })
 
     return render(request, "encyclopedia/new_entry.html", {})
 
@@ -74,8 +87,16 @@ def edit_entry(request):
                 "title": title,
                 "info": md,
             })
+             
         if title is "":
-            return HttpResponse("Title can't be empty")
+            return render(request, 'encyclopedia/error.html', {
+                'message': "The Title is empty",
+            })
+
+        if desc is "":
+            return render(request, 'encyclopedia/error.html', {
+                'message': "The Content is empty",
+            })
 
         util.save_entry(title, desc)
         info = convertMd(title)
