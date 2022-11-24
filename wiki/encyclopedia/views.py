@@ -19,7 +19,9 @@ def index(request):
 def entry(request, title):
     info = convertMd(title)
     if info == None:
-        return render(request, "encyclopedia/error.html")
+        return render(request, "encyclopedia/error.html", {
+            'message': "This entry doesn't exist"
+        })
 
     return render(request, "encyclopedia/entry.html", {
         "info": info,
